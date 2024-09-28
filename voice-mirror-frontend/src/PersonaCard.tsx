@@ -5,7 +5,11 @@ export default function PersonaCard({ persona }: any) {
   // typical card layout with image, title, and description and edit button
   const navigate = useNavigate();
   return (
-    <button>
+    <button
+      onClick={() => {
+        navigate("/chat/" + persona.id);
+      }}
+    >
       <div className="flex border-2 rounded-xl border-primaryBorder bg-secondary p-3 gap-4 h-32">
         <div className="flex flex-col justify-center">
           <img
