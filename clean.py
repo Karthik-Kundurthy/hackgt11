@@ -36,9 +36,9 @@ def save_cleaned_conversation(cleaned_messages, output_file_path):
         for message in cleaned_messages:
             file.write(f"{message}\n")
 
-# Example usage
-input_file = 'whatsapp_chat.txt'  # Path to your input text file
-output_file = 'cleaned_chat.txt'  # Path to save the cleaned messages
 
-cleaned_messages = clean_conversation(input_file)
-save_cleaned_conversation(cleaned_messages, output_file)
+# input_file = 'whatsapp_chat.txt'
+# output_file = 'cleaned_chat.txt'
+
+# cleaned_messages = clean_conversation(input_file)
+# save_cleaned_conversation(cleaned_messages, output_file)
