@@ -19,6 +19,7 @@ module.exports = {
         inputBackground: "#FFFFFF",
         inputBorder: "#B0BEC5",
         inputFocus: "#0288D1",
+        formLabelText: "#4F4F4F",
         primaryButtonText: "#FFFFFF",
         secondaryButtonText: "#000000",
       },

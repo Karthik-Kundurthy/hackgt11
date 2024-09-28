@@ -11,6 +11,7 @@ export default function HomePage() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, molestie ipsum et, eleifend nunc",
     },
   ];
+
   return (
     <div className="flex flex-col justify-center items-center gap-5">
       <h1 className="text-5xl font-bold text-primaryText">Choose a persona.</h1>
