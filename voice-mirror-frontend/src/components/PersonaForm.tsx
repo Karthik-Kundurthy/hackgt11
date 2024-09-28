@@ -27,12 +27,20 @@ export default function PersonaForm() {
         <input type="file" name="documents" accept="text/plain" />
       </div>
       <button
-        className="bg-primaryButton text-primaryButtonText rounded-full py-1 px-5 font-semibold"
+        className="bg-primaryButton text-primaryButtonText rounded-full py-1 px-5 font-semibold w-32"
         onClick={() => {
           navigate("/");
         }}
       >
         Submit
+      </button>
+      <button
+        className="bg-secondaryButton text-secondaryButtonText rounded-full py-1 px-5 font-semibold w-32"
+        onClick={() => {
+          navigate("/");
+        }}
+      >
+        Exit
       </button>
     </div>
   );
