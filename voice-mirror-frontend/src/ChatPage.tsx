@@ -1,3 +1,6 @@
+import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
 export default function ChatPage() {
   const messages: any = [
     {
@@ -12,11 +15,23 @@ export default function ChatPage() {
   const inputValue = "";
   const handleInputChange = () => {};
   const handleSendMessage = () => {};
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-1 flex-col bg-secondary w-full mx-auto rounded-lg overflow-hidden">
-      <div className="p-4 bg-secondary border-b text-center font-bold text-lg">
-        Harish
+      <div className="flex justify-evenly border-b">
+        <div className="flex-1 ml-3 flex items-center">
+          <button
+            className="bg-primaryButton text-primaryButtonText p-2 rounded-full"
+            onClick={() => navigate("/")}
+          >
+            <FaArrowLeft />
+          </button>
+        </div>
+        <div className="flex-1 p-4 bg-secondary text-center font-bold text-lg">
+          Harish
+        </div>
+        <span className="flex-1"></span>
       </div>
       <div
         style={{
