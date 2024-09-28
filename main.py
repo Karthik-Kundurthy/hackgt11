@@ -1,15 +1,24 @@
 import langchain
+from langchain_community.llms import OpenAI
 from openai import OpenAI
 from langchain_openai import OpenAIEmbeddings
 import secrets as s
 from pymongo.mongo_client import MongoClient
+from requests.auth import HTTPDigestAuth
+# from langchain_mongodb.vectorstores import MongoDBAtlasVectorSearch
+from langchain_community.document_loaders import DirectoryLoader
+from langchain.llms import OpenAI
+from langchain.chains import RetrievalQA
+# import key_param
+import json
+import os
+import requests
+import getpass
+from pymongo.operations import SearchIndexModel
+
 
 
 embeddings_model = OpenAIEmbeddings(api_key=s.api_key)
-
-import os
-
-
 
 
 def get_openai_client():
@@ -34,6 +43,7 @@ embeddings = embeddings_model.embed_documents(
     ]
 )
 
+print(len(embeddings), len(embeddings[0]))
 
 
 uri = s.uri
@@ -47,6 +57,95 @@ try:
     print("Pinged your deployment. You successfully connected to MongoDB!")
 except Exception as e:
     print(e)
+
+
+PUBLIC_KEY = s.public_key
+PRIVATE_KEY = s.private_key
+GROUP_ID = "66f75b9164ca15604af8510b"
+CLUSTER_NAME = "voiceMirrorVectorDB"
+DB_NAME = "voicemirror"
+EMBEDDING_SIZE = 1536
+INDEX_CREATION_URL =f"https://cloud.mongodb.com/api/atlas/v1.0/groups/{GROUP_ID}/clusters/{CLUSTER_NAME}/fts/indexes"
+COLLECTION_NAME = "test1"
+
+database = client[DB_NAME]
+collection = database["test1"]
+
+
+def contains_index(index_name):
+    indexes = collection.list_search_indexes()
+    return index_name in indexes
+
+def createIndex(username):
+    if contains_index(username):
+        print("INDEX ALR EXISTS")
+        return
+    search_index_model = SearchIndexModel(
+        definition= {
+            "fields": [
+                {
+                    "type": "vector",
+                    "numDimensions": EMBEDDING_SIZE,
+                    "path": "text_embedding",
+                    "similarity": "dotProduct"
+                },
+                {
+                    "type": "filter",
+                    "path": "username"
+                },
+                {
+                    "type": "filter",
+                    "path": "persona"
+                },
+                {
+                    "type": "filter",
+                    "path": "raw_text"
+                },
+                {
+                    "type": "filter",
+                    "path": "conversation_id"
+                },
+            ]
+        },
+        name=username,
+        type="vectorSearch",
+    )
+
+    result = collection.create_search_index(model=search_index_model)
+    print(result)
+
+def create_proto_indices():
+    createIndex("karthik")
+    createIndex("harish")
+    createIndex("test_user")
+
+def createTestIndex(collection_name="users"):
+    search_index_config = {
+        "collectionName": collection_name,
+        "database": DB_NAME,
+        "name": "vectorSearchIndex",
+        "mappings": {
+            "dynamic": False,
+            "fields": {
+                "embedding": {
+                    "type": "knnVector",
+                    "dimensions": 512,  # Replace with the correct number of dimensions in your vectors
+                    "similarity": "cosine"  # Use 'cosine', 'euclidean', or 'l2Norm'
+                }
+            }
+        }
+    }
+
+    response = requests.post(
+        INDEX_CREATION_URL,
+        auth=HTTPDigestAuth(PUBLIC_KEY, PRIVATE_KEY),
+        headers={'Content-Type': 'application/json'},
+        data=json.dumps(search_index_config)
+    )
+
+    print(response)
+
+# createIndex()
 
 
 # Defininig vector seaerch pipeline using sample mflix dataset
@@ -77,5 +176,35 @@ def sample_search():
     for i in result:
         print(i)
 
-sample_search()
-# print(len(embeddings), len(embeddings[0]))
+# sample_search()
+
+# sample index 
+def index_ingest(collection_name, database_name):
+    search_index_config = {
+        "collectionName": collection_name,
+        "database": database_name,
+        "name": "test_index",
+        "mappings": {
+            "dynamic": False,
+            "fields": {
+                "embedding": {
+                    "type": "knnVector",
+                    "dimensions": EMBEDDING_SIZE,  # Replace with your vector dimension
+                    "similarity": "dot"  # Use 'cosine', 'euclidean', or 'l2Norm'
+                }
+            }
+        }
+    }
+    response = requests.post(
+        url,
+        auth=HTTPDigestAuth(),
+        headers={'Content-Type': 'application/json'},
+        data=json.dumps(search_index_config)
+    )
+
+if __name__ == "__main__":
+    # creating prototype users for our application
+    # Adding a user per index, with multiple personas per index
+    create_proto_indices()
+
+# search("test-collection", "voiceMirrorVectorDB")
