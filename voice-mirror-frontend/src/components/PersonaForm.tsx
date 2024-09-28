@@ -20,11 +20,25 @@ export default function PersonaForm() {
         <label className="block text-formLabelText font-bold mb-1 md:mb-0 pr-4">
           Avatar
         </label>
-        <input type="file" name="avatar" accept="image/png, image/jpeg" />
-        <label className="block text-formLabelText font-bold mb-1 md:mb-0 pr-4">
+        <input
+          type="file"
+          name="avatar"
+          accept="image/png, image/jpeg"
+          className="block w-full bg-inputBackground appearance-none border-2 border-inputBorder rounded py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:border-inputFocus"
+        />
+        <label
+          className="block text-formLabelText font-bold mb-1 md:mb-0 pr-4"
+          htmlFor="multiple_files"
+        >
           Documents
         </label>
-        <input type="file" name="documents" accept="text/plain" />
+        <input
+          className="block w-full bg-inputBackground appearance-none border-2 border-inputBorder rounded py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:border-inputFocus"
+          id="multiple_files"
+          type="file"
+          accept="text/plain"
+          multiple
+        />
       </div>
       <button
         className="bg-primaryButton text-primaryButtonText rounded-full py-1 px-5 font-semibold w-32"

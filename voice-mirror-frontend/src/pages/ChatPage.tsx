@@ -72,7 +72,7 @@ export default function ChatPage() {
         />
         <button
           onClick={handleSendMessage}
-          className="text-white font-bold py-2 px-4 rounded bg-primary hover:bg-primary-dark focus:outline-none focus:shadow-outline"
+          className="text-white font-bold py-2 px-4 rounded bg-primaryButton hover:bg-primary-dark focus:outline-none focus:shadow-outline"
         >
           Send
         </button>
