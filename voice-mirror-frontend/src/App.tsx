@@ -1,10 +1,10 @@
 import "./App.css";
-import AppLayout from "./AppLayout";
-import HomePage from "./HomePage";
+import AppLayout from "./layouts/AppLayout";
+import HomePage from "./pages/HomePage";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import CreatePage from "./CreatePage";
-import EditPage from "./EditPage";
-import ChatPage from "./ChatPage";
+import CreatePage from "./pages/CreatePage";
+import EditPage from "./pages/EditPage";
+import ChatPage from "./pages/ChatPage";
 
 function App() {
   return (

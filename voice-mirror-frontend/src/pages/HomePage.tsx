@@ -1,6 +1,6 @@
-import PersonaCard from "./PersonaCard";
-import AddPersonaCard from "./AddPersonaCard";
-import avatar from "./assets/avatar.png";
+import PersonaCard from "../components/PersonaCard";
+import AddPersonaCard from "../components/AddPersonaCard";
+import avatar from "../assets/avatar.png";
 
 export default function HomePage() {
   const personaList: any[] = [

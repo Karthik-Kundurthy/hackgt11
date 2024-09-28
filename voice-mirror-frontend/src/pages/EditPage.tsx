@@ -1,4 +1,4 @@
-import PersonaForm from "./PersonaForm";
+import PersonaForm from "../components/PersonaForm";
 import { useParams } from "react-router-dom";
 
 export default function EditPage() {

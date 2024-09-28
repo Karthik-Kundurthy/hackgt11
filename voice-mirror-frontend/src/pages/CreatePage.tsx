@@ -1,4 +1,4 @@
-import PersonaForm from "./PersonaForm";
+import PersonaForm from "../components/PersonaForm";
 
 export default function CreatePage() {
   return (
