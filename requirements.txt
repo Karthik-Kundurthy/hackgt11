@@ -1,0 +1,8 @@
+fastapi[standard]
+uvicorn
+langchain
+langchain-community
+langchain-google-genai
+pymongo
+passlib[bcrypt]
+pyjwt
