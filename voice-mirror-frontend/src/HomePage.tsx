@@ -5,6 +5,7 @@ import avatar from "./assets/avatar.png";
 export default function HomePage() {
   const personaList: any[] = [
     {
+      id: 1,
       image: avatar,
       name: "Harish Kanthi",
       description:
