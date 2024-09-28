@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import CreatePage from "./pages/CreatePage";
 import EditPage from "./pages/EditPage";
 import ChatPage from "./pages/ChatPage";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/create" element={<CreatePage />} />
           <Route path="/edit/:id" element={<EditPage />} />
           <Route path="/chat/:id" element={<ChatPage />} />
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </Router>
     </AppLayout>
