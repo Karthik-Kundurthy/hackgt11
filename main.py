@@ -15,6 +15,7 @@ import os
 import requests
 import getpass
 from pymongo.operations import SearchIndexModel
+import datetime
 
 
 
@@ -45,10 +46,8 @@ embeddings = embeddings_model.embed_documents(
 
 print(len(embeddings), len(embeddings[0]))
 
-
-uri = s.uri
-
 # Create a new client and connect to the server
+uri = s.uri
 client = MongoClient(uri)
 
 # Send a ping to confirm a successful connection
@@ -58,7 +57,7 @@ try:
 except Exception as e:
     print(e)
 
-
+# Key constants
 PUBLIC_KEY = s.public_key
 PRIVATE_KEY = s.private_key
 GROUP_ID = "66f75b9164ca15604af8510b"
@@ -68,8 +67,14 @@ EMBEDDING_SIZE = 1536
 INDEX_CREATION_URL =f"https://cloud.mongodb.com/api/atlas/v1.0/groups/{GROUP_ID}/clusters/{CLUSTER_NAME}/fts/indexes"
 COLLECTION_NAME = "test1"
 
+# pulled from documentation
 database = client[DB_NAME]
 collection = database["test1"]
+
+
+# Key data structures
+user_persona_map = {}
+user_index_map = {}
 
 
 def contains_index(index_name):
@@ -112,12 +117,51 @@ def createIndex(username):
     )
 
     result = collection.create_search_index(model=search_index_model)
-    print(result)
+    return result
 
+# initialize the users in the database
 def create_proto_indices():
-    createIndex("karthik")
-    createIndex("harish")
-    createIndex("test_user")
+    res1 = createIndex("karthik")
+    user_index_map["karthik"] = res1
+    res2 = createIndex("harish")
+    user_index_map["harish"] = res2
+    res3 = createIndex("test_user")
+    user_index_map["test_user"] = res3
+
+# update mapping
+def addPersona(username, persona):
+    user_persona_map[username] = persona
+
+def addData(user, persona, text_chunk):
+    if user in user_index_map.keys():
+        index = user_index_map[user]
+    else:
+        index = None
+        return {"message": "user doesn't exist"}
+    
+    # create text embedding
+    try:
+        embedding_vector = embeddings_model.embed_documents([text_chunk])[0]
+    except Exception as e:
+        embedding_vector= None
+        return {"message": "could not embed"}
+
+    # create document and insert
+    now = datetime.datetime.now()
+    document = {
+        "username": user,
+        "persona": persona,
+        "raw_text": text_chunk,
+        "conversation_id": f"{user}:{persona}:{now}",
+        "text_embedding": embedding_vector  # Adding generated embedding vector
+    }
+
+    try:
+        idx = client["your_database_name"][index]
+        result = idx.insert_one(document) 
+        return {"message": "Data inserted successfully", "document_id": str(result.inserted_id)}
+    except Exception as e:
+        return {"error": f"Failed to insert data into MongoDB: {str(e)}"}
 
 def createTestIndex(collection_name="users"):
     search_index_config = {
@@ -196,15 +240,41 @@ def index_ingest(collection_name, database_name):
         }
     }
     response = requests.post(
-        url,
+        INDEX_CREATION_URL,
         auth=HTTPDigestAuth(),
         headers={'Content-Type': 'application/json'},
         data=json.dumps(search_index_config)
     )
 
+def parse_and_add_data(user, persona, file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        chunks = file.read().split("\n")
+    
+    for index, chunk in enumerate(chunks):
+        if chunk.strip():
+            response = addData(
+                user="karthik",
+                persona="harish",
+                text_chunk=chunk
+            )
+
+        print(f"Inserted chunk {index + 1}: {response}")
+
+    pass
+
+# Prefilling database
 if __name__ == "__main__":
     # creating prototype users for our application
     # Adding a user per index, with multiple personas per index
-    create_proto_indices()
+    try:
+        create_proto_indices()
+    except Exception as e:
+        print(f"ALREADY CREATED: {e}")
+
+
+    parse_and_add_data("karthik", "harish", "message_chunks.txt")
+
+    
+
 
 # search("test-collection", "voiceMirrorVectorDB")
