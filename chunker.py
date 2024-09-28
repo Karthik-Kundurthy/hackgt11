@@ -1,9 +1,4 @@
-from sentence_transformers import SentenceTransformer
 import numpy as np
-import faiss
-
-# Initialize the model
-model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # Function to read messages from a text file
 def load_messages_from_file(filename):
