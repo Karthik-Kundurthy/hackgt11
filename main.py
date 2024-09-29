@@ -19,7 +19,6 @@ import datetime
 import asyncio
 
 
-
 embeddings_model = OpenAIEmbeddings(api_key=s.api_key)
 
 

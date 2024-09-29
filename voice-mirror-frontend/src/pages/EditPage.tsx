@@ -48,6 +48,7 @@ export default function EditPage() {
         personaFormHandler={editPersona}
         name={persona.name}
         description={persona.description}
+        isEdit={true}
       />
     </div>
   );

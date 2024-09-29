@@ -11,6 +11,7 @@ interface PersonaFormProps {
   name?: string;
   description?: string;
   avatar?: any;
+  isEdit?: boolean;
 }
 export default function PersonaForm(props: PersonaFormProps) {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function PersonaForm(props: PersonaFormProps) {
     personaFormHandler,
     name: nameProp,
     description: descriptionProp,
+    isEdit: isEditProp,
   } = props;
   const [name, setName] = React.useState(nameProp ?? "");
   const [description, setDescription] = React.useState(descriptionProp ?? "");
@@ -30,12 +32,18 @@ export default function PersonaForm(props: PersonaFormProps) {
         <label className="block text-formLabelText font-bold mb-1 md:mb-0 pr-4">
           Name
         </label>
-        <input
-          type="text"
-          value={name}
-          className="bg-inputBackground appearance-none border-2 border-inputBorder rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:border-inputFocus"
-          onChange={(e) => setName(e.target.value)}
-        />
+        {isEditProp ? (
+          <span className="appearance-none w-full py-2 px-4 text-gray-700 leading-tight">
+            {name}
+          </span>
+        ) : (
+          <input
+            type="text"
+            value={name}
+            className="bg-inputBackground appearance-none border-2 border-inputBorder rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:border-inputFocus"
+            onChange={(e) => setName(e.target.value)}
+          />
+        )}
         <label className="block text-formLabelText font-bold  mb-1 md:mb-0 pr-4">
           Description
         </label>
