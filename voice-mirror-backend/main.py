@@ -10,37 +10,24 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 import jwt
-
 from pymongo.mongo_client import MongoClient
-import secrets as s
 from langchain_community.llms import OpenAI
 from openai import OpenAI
 from langchain_openai import OpenAIEmbeddings
 from pymongo.operations import SearchIndexModel
 
-# Create a new client and connect to the server
-uri = s.uri
-client = MongoClient(uri)
-
-# embedding model
-embeddings_model = OpenAIEmbeddings(api_key=s.api_key)
 
 # Load environment variables & set constants
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MONGODB_URI = os.getenv("MONGODB_URI")
 JWT_SECRET_KEY = os.getenv("SECRET_KEY")
 JWT_ALGORITHM = "HS256"
-PUBLIC_KEY = s.public_key
-PRIVATE_KEY = s.private_key
 CLUSTER_NAME = "voiceMirrorVectorDB"
-GROUP_ID = s.group_id
 DB_NAME = "voicemirror"
 EMBEDDING_SIZE = 1536
 CONVERSATION_COLLECTION = "conversations"
-# pulled from documentation
-database = client[DB_NAME]
-collection = database[CONVERSATION_COLLECTION]
 
 
 # Initialize clients & security
@@ -48,6 +35,10 @@ llm_client = GeminiAdapter(GEMINI_API_KEY)
 db_client = MongoAdapter(MONGODB_URI)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+embeddings_model = OpenAIEmbeddings(api_key=OPENAI_API_KEY)
+client = MongoClient(MONGODB_URI)
+database = client[DB_NAME]
+collection = database[CONVERSATION_COLLECTION]
 
 # Initialize FastAPI
 app = FastAPI()
