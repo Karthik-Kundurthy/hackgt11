@@ -4,7 +4,6 @@ import { ProfileContext } from "../contexts/ProfileContext";
 import { Navigate } from "react-router-dom";
 import { persona_create } from "../api/api";
 
-
 export default function CreatePage() {
   const { profile } = useContext(ProfileContext);
 
@@ -16,18 +15,21 @@ export default function CreatePage() {
     name: string,
     description: string,
     avatar: any,
-    documents: any,
+    documents: FileList,
   ) => {
-    console.log(profile.username, name, description, documents)
-    const reader = new FileReader()
-    reader.onload = async (e) => { 
-      const text = (e.target!.result)
-      console.log(text)
+    console.log(profile.username, name, description, documents);
+    const reader = new FileReader();
+    const files: any[] = [];
+    reader.onload = async (e) => {
+      const text = e.target!.result;
+      files.push(text);
     };
-    documents.foreach((document: any) => {
-      reader.readAsText(document)
-    })
-    //await persona_create(profile.username, name, description, documents)
+    // iterate over documents
+    for (let i = 0; i < documents.length; i++) {
+      const file = documents[i];
+      reader.readAsText(file);
+    }
+    await persona_create(profile.username, name, description, files);
   };
 
   return (
