@@ -187,6 +187,10 @@ def addData(persona, recipient, text_chunk):
     except Exception as e:
         return {"error": f"Failed to insert data into MongoDB: {str(e)}"} 
 
+def documentToChunks(document):
+    
+    pass
+
 class PersonaRequest(BaseModel):
     username: str
     persona: str
@@ -195,17 +199,30 @@ class PersonaRequest(BaseModel):
 
 @app.post("/add_persona")
 def add_persona(persona_request: PersonaRequest):
-    if not db_client.get_user(persona_request.username):
-        raise HTTPException(status_code=400, detail="Username doesn't exist")
+    # if not db_client.get_user(persona_request.username):
+    #     raise HTTPException(status_code=400, detail="Username doesn't exist")
     
-    db_client.add_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
+    # db_client.add_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
+
+    username = persona_request.username
+    persona = persona_request.persona
+    description = persona_request.description
+    documents = persona_request.documents
+
+    for document in documents:
+        chunks = documentToChunks(document)
+        for chunk in chunks:
+            addData(persona, "none", chunk)
+        
+
+    pass
     
 @app.post("/edit_persona")
 def edit_persona(persona_request: PersonaRequest):
-    if not db_client.get_user(persona_request.username):
-        raise HTTPException(status_code=400, detail="Username doesn't exist")
+    # if not db_client.get_user(persona_request.username):
+    #     raise HTTPException(status_code=400, detail="Username doesn't exist")
     
-    db_client.edit_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
+    # db_client.edit_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
 
 
 
