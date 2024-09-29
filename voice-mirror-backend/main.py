@@ -92,6 +92,7 @@ def authenticate_user(token: str = Depends(oauth2_scheme)) -> str:
     print("username: ", username)
     return username
 
+
 # ref: https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/
 def get_search_pipeline(persona, query_text):
     # define pipeline
@@ -188,6 +189,26 @@ def addData(persona, recipient, text_chunk):
         return {"message": "Data inserted successfully", "document_id": str(result.inserted_id)}
     except Exception as e:
         return {"error": f"Failed to insert data into MongoDB: {str(e)}"} 
+
+class PersonaRequest(BaseModel):
+    username: str
+    persona: str
+    description: str
+
+@app.post("/add_persona")
+def add_persona(persona_request: PersonaRequest):
+    if not db_client.get_user(persona_request.username):
+        raise HTTPException(status_code=400, detail="Username doesn't exist")
+    
+    db_client.add_persona(persona_request.username, persona_request.persona)
+    
+@app.post("/edit_persona")
+def edit_persona(persona_request: PersonaRequest):
+    if not db_client.get_user(persona_request.username):
+        raise HTTPException(status_code=400, detail="Username doesn't exist")
+    
+    db_client.edit_persona(persona_request.username, persona_request.persona, persona_request.description)
+
 
 
 @app.post("/add_data")
