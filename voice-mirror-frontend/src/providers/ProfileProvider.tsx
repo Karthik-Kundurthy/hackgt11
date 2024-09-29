@@ -23,20 +23,24 @@ export default function ProfileProvider({ children }: any) {
     } else {
       localStorage.setItem("token", response.data.access_token);
       setProfile({ username: username });
-      const personas = await get_personas(username);
-
-      if (personas.error) {
-        return;
-      }
-
-      setPersonas(
-        personas.data.personas.map((persona: any) => ({
-          name: persona.name,
-          description: persona.description,
-        })),
-      );
+      await refreshPersonas(username);
     }
   };
+
+  const refreshPersonas = async (username: string) => {
+    const personas = await get_personas(username);
+
+    if (personas.error) {
+      return;
+    }
+
+    setPersonas(
+      personas.data.personas.map((persona: any) => ({
+        name: persona.name,
+        description: persona.description,
+      })),
+    );
+  }
 
   return (
     <ProfileContext.Provider
@@ -44,6 +48,7 @@ export default function ProfileProvider({ children }: any) {
         profile: profile,
         personas: personas,
         handleLogin: handleLogin,
+        refreshPersonas: refreshPersonas,
       }}
     >
       {children}
