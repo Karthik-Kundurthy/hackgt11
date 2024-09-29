@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 export default function EditPage() {
   // use this id later
   const { name } = useParams();
-  const { profile, personas } = useContext(ProfileContext);
+  const { profile, personas, refreshPersonas } = useContext(ProfileContext);
   const navigate = useNavigate();
   const persona = personas.find((persona) => persona.name === name);
 
@@ -38,6 +38,7 @@ export default function EditPage() {
 
     const files: any[] = await Promise.all(promises);
     await persona_edit(profile.username, name, description, files);
+    await refreshPersonas(profile.username);
     navigate("/");
   };
 

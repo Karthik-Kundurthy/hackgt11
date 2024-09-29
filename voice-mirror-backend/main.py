@@ -16,7 +16,7 @@ from openai import OpenAI
 from langchain_openai import OpenAIEmbeddings
 from pymongo.operations import SearchIndexModel
 
-from chunker import process_document
+# from chunker import process_document
 
 
 # Load environment variables & set constants

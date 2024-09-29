@@ -6,7 +6,7 @@ import { persona_create } from "../api/api";
 import { useNavigate } from "react-router-dom";
 
 export default function CreatePage() {
-  const { profile } = useContext(ProfileContext);
+  const { profile, refreshPersonas } = useContext(ProfileContext);
   const navigate = useNavigate();
 
   if (!profile) {
@@ -32,6 +32,7 @@ export default function CreatePage() {
     const files: any[] = await Promise.all(promises);
 
     await persona_create(profile.username, name, description, files);
+    await refreshPersonas(profile.username);
     navigate("/");
   };
 
