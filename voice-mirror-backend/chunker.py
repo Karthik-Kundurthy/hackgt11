@@ -4,8 +4,8 @@ import argparse
 
 print("hello")
 
-WINDOW_SIZE=10
-INCREMENT= 5
+WINDOW_SIZE=100
+INCREMENT= 50
 
 def process_document(conversation, speaker_a, speaker_b):
 
