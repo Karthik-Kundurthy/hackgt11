@@ -34,3 +34,11 @@ export const signup = async (username: string, password: string) => {
 export const chat = async (message: string) => {
     return await fetchApi("chat", "POST", { message })
 };
+
+export const persona_create = async (username: string, persona: string, description: string, documents: any[]) => {
+    return await  fetchApi("add_persona", "POST", {username, persona, description, documents})
+};
+
+export const persona_edit = async (username: string, persona: string, description: string, documents: any[]) => {
+    return await  fetchApi("edit_persona", "POST", {username, persona, description, documents})
+};
