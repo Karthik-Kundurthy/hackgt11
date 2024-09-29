@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from gemini_adapter import GeminiAdapter
 from mongo_adapter import MongoAdapter, User
@@ -24,6 +25,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 # Initialize FastAPI
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Helper Functions
 def hash_password(password: str) -> str:
@@ -81,4 +90,4 @@ def protected_route(message: str, username: str = Depends(authenticate_user)):
     
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8080)
