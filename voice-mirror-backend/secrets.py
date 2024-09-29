@@ -4,3 +4,4 @@ connection_string="mongodb+srv://karthikkundurthy:P978MHSWhtycWRC8@voicemirrorve
 uri = "mongodb+srv://karthikkundurthy:P978MHSWhtycWRC8@voicemirrorvectordb.a3on0.mongodb.net/?retryWrites=true&w=majority&appName=voiceMirrorVectorDB"
 public_key = "bxgskimc"
 private_key = "16f2cb24-7296-4da8-9c89-bc8a2d4f8e89"
+group_id = "66f75b9164ca15604af8510b"
