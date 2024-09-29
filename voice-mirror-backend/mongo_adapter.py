@@ -22,15 +22,20 @@ class MongoAdapter:
         self.users.insert_one({COL_USERNAME: username, COL_PASSWORD: hashed_password})
 
     def add_persona(self, username: str, persona_name: str, persona_descr: str, persona_docs: list) -> None:
+
+        user = self.users.find_one({COL_USERNAME: username})
         self.users.update_one(
             {COL_USERNAME: username},
             {"$set": {COL_PERSONA: persona_name, COL_DESCRIPTION: persona_descr, COL_DOCUMENTS: persona_docs}}
         )
     
-    def edit_persona(self, username, persona, description):
+    def edit_persona(self, username, persona, description, persona_docs):
         self.users.update_one(
             {COL_USERNAME: username},
-            {"$set": {COL_PERSONA: persona, COL_DESCRIPTION: description}}
+            {
+                "$set": {COL_PERSONA: persona, COL_DESCRIPTION: description},
+                "$push": {COL_DOCUMENTS: {"$each": persona_docs}}  # Append docs
+            }
         )
 
         pass
