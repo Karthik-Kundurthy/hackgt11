@@ -90,9 +90,7 @@ def authenticate_user(token: str = Depends(oauth2_scheme)) -> str:
 
 
 # ref: https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/
-def get_search_pipeline(persona, query_text):
-    # define pipeline
-    # vector matching and filters by user and personality
+def get_search_pipeline(username, persona, query_text):
     query_vector = embeddings_model.embed_documents([query_text])[0]
     pipeline = [
         {
@@ -100,29 +98,44 @@ def get_search_pipeline(persona, query_text):
                 'index': "default",
                 'path': 'text_embedding',
                 'queryVector': query_vector,
+                'filter': {
+                    'username': username,
+                    'persona': persona
+                },
                 'numCandidates': 30,
-                'limit': 10
-            }
-        },
-        {
-            '$match': {
-                # 'username': recipient,
-                'persona': persona
+                'limit': 1
             }
         },
         {
             '$project': {
                 'raw_text': 1,
-                'conversation_id': 1,
-                'score': {
-                    '$meta': 'vectorSearchScore'
-                }
             }
         }
     ]
 
     return pipeline
 
+def addData(username, persona, text_chunk):
+    try:
+        embedding_vector = embeddings_model.embed_documents([text_chunk])[0]
+    except Exception as e:
+        embedding_vector= None
+        return {"message": "could not embed"}
+
+    now = datetime.now()
+    document = {
+        "username": username,
+        "persona": persona,
+        "raw_text": text_chunk,
+        "conversation_id": f"{username}:{persona}:{now}",
+        "text_embedding": embedding_vector  # Adding generated embedding vector
+    }
+
+    try:
+        result = collection.insert_one(document)
+        return {"message": "Data inserted successfully", "document_id": str(result.inserted_id)}
+    except Exception as e:
+        return {"error": f"Failed to insert data into MongoDB: {str(e)}"}
 
 # Routes
 @app.get("/")
@@ -153,42 +166,20 @@ def login_user(login_request: LoginRequest):
     return {"access_token": token}
 
 class ChatRequest(BaseModel):
+    persona: str
     message: str
-    threadId: str
+    threadId: str   
 
 @app.post("/chat")
 def protected_route(chat_request: ChatRequest, username: str = Depends(authenticate_user)):
-    response = llm_client.chat(username, chat_request.message, chat_request.threadId)
+    pipeline = get_search_pipeline(username, chat_request.persona, chat_request.message)
+    results = list(collection.aggregate(pipeline))
+    context = None
+    if results:
+        context = results[0]["raw_text"]
+    
+    response = llm_client.chat(username, chat_request.persona, chat_request.message, chat_request.threadId, context)
     return {"reply": response}
-
-def addData(username, persona, text_chunk):
-
-    # create text embedding
-    try:
-        embedding_vector = embeddings_model.embed_documents([text_chunk])[0]
-    except Exception as e:
-        embedding_vector= None
-        return {"message": "could not embed"}
-
-    # create document and insert
-    now = datetime.now()
-    document = {
-        "username": username,
-        "persona": persona,
-        "raw_text": text_chunk,
-        "conversation_id": f"{username}:{persona}:{now}",
-        "text_embedding": embedding_vector  # Adding generated embedding vector
-    }
-
-    try:
-        result = collection.insert_one(document)
-        return {"message": "Data inserted successfully", "document_id": str(result.inserted_id)}
-    except Exception as e:
-        return {"error": f"Failed to insert data into MongoDB: {str(e)}"}
-
-def editPersonaData(persona):
-
-    pass
 
 class ModifyPersonaRequest(BaseModel):
     username: str
@@ -208,15 +199,10 @@ def add_persona(persona_request: ModifyPersonaRequest):
         persona_request.description, 
     )
 
-    username = persona_request.username
-    persona = persona_request.persona
-    description = persona_request.description
-    documents = persona_request.documents
-
-    for document in documents:
+    for document in persona_request.documents:
         chunks = process_logs(document)
         for chunk in chunks:
-            addData(username, persona, chunk)
+            addData(persona_request.username, persona_request.persona, chunk)
 
 @app.post("/edit_persona")
 def edit_persona(persona_request: ModifyPersonaRequest):
@@ -230,15 +216,10 @@ def edit_persona(persona_request: ModifyPersonaRequest):
         persona_request.description
     )
 
-    username = persona_request.username
-    persona = persona_request.persona
-    description = persona_request.description
-    documents = persona_request.documents
-
-    for document in documents:
+    for document in persona_request.documents:
         chunks = process_document(document)
         for chunk in chunks:
-            addData(persona, "none", chunk)
+            addData(persona_request.username, persona_request.persona, chunk)
 
 class PersonaRequest(BaseModel):
     username: str
@@ -266,26 +247,6 @@ def parse_and_add_data(persona, recipient, file_path):
             )
 
         print(f"Inserted chunk {index + 1}: {response}")
-
-    pass
-
-@app.post("/search")
-def run_vector_search(persona, query_text):
-    pipeline = get_search_pipeline(persona, query_text)
-    results = collection.aggregate(pipeline)
-    return results
-
-@app.post("/example_search")
-def sample_conversation_search():
-    file_path = "message_chunks.txt"
-    with open(file_path, 'r', encoding='utf-8') as file:
-        chunks = file.read().split("\n")
-
-    test = chunks[0]
-    results = run_vector_search("karthik", "harish", test)
-    for result in list(results):
-        print(result['raw_text'], '\n')
-
 
 
 if __name__ == "__main__":

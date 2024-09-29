@@ -39,20 +39,26 @@ class GeminiAdapter:
         response = self.gemini_llm.invoke(state["messages"])
         return {"messages": response}
     
-    def _initialize_conversation(self, config: dict):
+    def _initialize_conversation(self, username: str, persona: str, config: dict):
         self.app.invoke({"messages": [HumanMessage(SYSTEM_PROMPT)]}, config)
 
-    def chat(self, username: str, message: str, thread_id: str) -> BaseMessage:
+    def chat(self, username: str, persona: str, message: str, thread_id: str, context: str) -> BaseMessage:
         config = config = {"configurable": {"thread_id": thread_id}}
 
         if thread_id not in self.existing_thread_ids:
-            self._initialize_conversation(config)
+            self._initialize_conversation(username, persona, config)
             self.existing_thread_ids.add(thread_id)
+
+        if not context:
+            context = "(No sample conversation is available)"
 
         input_messages = [HumanMessage(message)]
         output = self.app.invoke({"messages": input_messages}, config)
         ai_message: AIMessage = output["messages"][-1]
 
         print("Thread ID:", thread_id)
-        print(ai_message)
+        print("Context:", context)
+        print("User Message:", message)
+        print("AI Message:", ai_message)
+
         return ai_message.content

@@ -36,7 +36,8 @@ export default function ChatPage() {
     setMessages(newMessages);
     setIsWaiting(true);
 
-    const response = await chat(inputValue, threadId);
+    if (!name) { alert("unknown persona"); return; }
+    const response = await chat(name, inputValue, threadId);
     if (response.error) {
       alert(response.data);
     } else {

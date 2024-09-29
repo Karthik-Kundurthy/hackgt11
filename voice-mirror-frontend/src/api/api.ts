@@ -27,8 +27,8 @@ export const signup = async (username: string, password: string) => {
   return await fetchApi("signup", "POST", { username, password });
 };
 
-export const chat = async (message: string, threadId: string) => {
-  return await fetchApi("chat", "POST", { message, threadId });
+export const chat = async (persona: string, message: string, threadId: string) => {
+  return await fetchApi("chat", "POST", { persona, message, threadId });
 };
 
 export const persona_create = async (
