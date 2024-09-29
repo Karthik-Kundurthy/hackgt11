@@ -21,8 +21,8 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/create" element={<CreatePage />} />
-          <Route path="/edit/:id" element={<EditPage />} />
-          <Route path="/chat/:id" element={<ChatPage />} />
+          <Route path="/edit/:name" element={<EditPage />} />
+          <Route path="/chat/:name" element={<ChatPage />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
       </Router>

@@ -61,7 +61,7 @@ def ping_uri():
     except Exception as e:
         print(e)
 
-ping_uri() 
+ping_uri()
 
 def hash_password(password: str) -> str:
     return password
@@ -87,7 +87,7 @@ def verify_jwt_token(token: str) -> str:
         raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
-    
+
 def authenticate_user(token: str = Depends(oauth2_scheme)) -> str:
     username = verify_jwt_token(token)
     return username
@@ -116,7 +116,7 @@ def get_search_pipeline(persona, query_text):
         },
         {
             '$project': {
-                'raw_text': 1,  
+                'raw_text': 1,
                 'conversation_id': 1,
                 'score': {
                     '$meta': 'vectorSearchScore'
@@ -124,7 +124,7 @@ def get_search_pipeline(persona, query_text):
             }
         }
     ]
-    
+
     return pipeline
 
 
@@ -165,7 +165,7 @@ def protected_route(chat_request: ChatRequest, username: str = Depends(authentic
     return {"reply": response}
 
 def addData(persona, recipient, text_chunk):
-    
+
     # create text embedding
     try:
         embedding_vector = embeddings_model.embed_documents([text_chunk])[0]
@@ -184,10 +184,10 @@ def addData(persona, recipient, text_chunk):
     }
 
     try:
-        result = collection.insert_one(document) 
+        result = collection.insert_one(document)
         return {"message": "Data inserted successfully", "document_id": str(result.inserted_id)}
     except Exception as e:
-        return {"error": f"Failed to insert data into MongoDB: {str(e)}"} 
+        return {"error": f"Failed to insert data into MongoDB: {str(e)}"}
 
 def editPersonaData(persona):
 
@@ -201,6 +201,7 @@ class PersonaRequest(BaseModel):
 
 @app.post("/add_persona")
 def add_persona(persona_request: PersonaRequest):
+<<<<<<< HEAD
     # if not db_client.get_user(persona_request.username):
     #     raise HTTPException(status_code=400, detail="Username doesn't exist")
     
@@ -223,6 +224,30 @@ def edit_persona(persona_request: PersonaRequest):
     #     raise HTTPException(status_code=400, detail="Username doesn't exist")
     
     # db_client.edit_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
+=======
+    if not db_client.get_user(persona_request.username):
+        raise HTTPException(status_code=400, detail="Username doesn't exist")
+
+    db_client.add_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
+
+@app.post("/edit_persona")
+def edit_persona(persona_request: PersonaRequest):
+    if not db_client.get_user(persona_request.username):
+        raise HTTPException(status_code=400, detail="Username doesn't exist")
+
+    db_client.edit_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
+>>>>>>> 3bf7eb5 (bunch of stuff)
+
+class PersonaGetRequest(BaseModel):
+    username: str
+
+@app.post("/get_personas")
+def get_personas(persona_request: PersonaGetRequest):
+    user = db_client.get_user(persona_request.username)
+    if not user:
+        raise HTTPException(status_code=400, detail="Username doesn't exist")
+
+    return {"personas": user.personas}
 
     username = persona_request.username
     persona = persona_request.persona
@@ -242,7 +267,7 @@ def edit_persona(persona_request: PersonaRequest):
 def parse_and_add_data(persona, recipient, file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         chunks = file.read().split("\n")
-    
+
     for index, chunk in enumerate(chunks):
         if chunk.strip():
             response = addData(
@@ -266,13 +291,13 @@ def sample_conversation_search():
     file_path = "message_chunks.txt"
     with open(file_path, 'r', encoding='utf-8') as file:
         chunks = file.read().split("\n")
-    
+
     test = chunks[0]
     results = run_vector_search("karthik", "harish", test)
     for result in list(results):
         print(result['raw_text'], '\n')
 
-    
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8080)

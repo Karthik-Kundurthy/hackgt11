@@ -599,6 +599,10 @@ video {
   margin-top: 1.25rem;
 }
 
+.mr-auto {
+  margin-right: auto;
+}
+
 .block {
   display: block;
 }

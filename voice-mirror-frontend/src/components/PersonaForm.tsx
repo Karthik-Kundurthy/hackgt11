@@ -8,12 +8,19 @@ interface PersonaFormProps {
     avatar: any,
     documents: any,
   ) => Promise<void>;
+  name?: string;
+  description?: string;
+  avatar?: any;
 }
 export default function PersonaForm(props: PersonaFormProps) {
   const navigate = useNavigate();
-  const { personaFormHandler } = props;
-  const [name, setName] = React.useState("");
-  const [description, setDescription] = React.useState("");
+  const {
+    personaFormHandler,
+    name: nameProp,
+    description: descriptionProp,
+  } = props;
+  const [name, setName] = React.useState(nameProp ?? "");
+  const [description, setDescription] = React.useState(descriptionProp ?? "");
   const [avatar, setAvatar] = React.useState<any>(null);
   const [files, setDocuments] = React.useState<any>(null);
 
@@ -66,7 +73,6 @@ export default function PersonaForm(props: PersonaFormProps) {
         className="bg-primaryButton text-primaryButtonText rounded-full py-1 px-5 font-semibold w-32"
         onClick={async () => {
           await personaFormHandler(name, description, avatar, files);
-          navigate("/");
         }}
       >
         Submit
