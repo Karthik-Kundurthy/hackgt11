@@ -2,6 +2,8 @@
 
 import argparse
 
+print("hello")
+
 WINDOW_SIZE=10
 INCREMENT= 5
 
