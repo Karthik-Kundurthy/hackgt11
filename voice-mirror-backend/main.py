@@ -191,20 +191,21 @@ class PersonaRequest(BaseModel):
     username: str
     persona: str
     description: str
+    documents: list
 
 @app.post("/add_persona")
 def add_persona(persona_request: PersonaRequest):
     if not db_client.get_user(persona_request.username):
         raise HTTPException(status_code=400, detail="Username doesn't exist")
     
-    db_client.add_persona(persona_request.username, persona_request.persona)
+    db_client.add_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
     
 @app.post("/edit_persona")
 def edit_persona(persona_request: PersonaRequest):
     if not db_client.get_user(persona_request.username):
         raise HTTPException(status_code=400, detail="Username doesn't exist")
     
-    db_client.edit_persona(persona_request.username, persona_request.persona, persona_request.description)
+    db_client.edit_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
 
 
 

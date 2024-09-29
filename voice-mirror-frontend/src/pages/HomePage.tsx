@@ -4,6 +4,8 @@ import avatar from "../assets/avatar.png";
 import { useContext } from "react";
 import { ProfileContext } from "../contexts/ProfileContext";
 import { Navigate } from "react-router-dom";
+import { persona_edit } from "../api/api";
+
 
 export default function HomePage() {
   const { profile, personas } = useContext(ProfileContext);
