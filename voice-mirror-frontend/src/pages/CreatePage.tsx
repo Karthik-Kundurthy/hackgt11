@@ -3,9 +3,11 @@ import { useContext } from "react";
 import { ProfileContext } from "../contexts/ProfileContext";
 import { Navigate } from "react-router-dom";
 import { persona_create } from "../api/api";
+import { useNavigate } from "react-router-dom";
 
 export default function CreatePage() {
   const { profile } = useContext(ProfileContext);
+  const navigate = useNavigate();
 
   if (!profile) {
     return <Navigate to="/login" />;
@@ -17,19 +19,20 @@ export default function CreatePage() {
     avatar: any,
     documents: FileList,
   ) => {
-    console.log(profile.username, name, description, documents);
-    const reader = new FileReader();
-    const files: any[] = [];
-    reader.onload = async (e) => {
-      const text = e.target!.result;
-      files.push(text);
-    };
     // iterate over documents
-    for (let i = 0; i < documents.length; i++) {
-      const file = documents[i];
-      reader.readAsText(file);
-    }
+    const promises = Array.from(documents).map((file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsText(file);
+      });
+    });
+
+    const files: any[] = await Promise.all(promises);
+
     await persona_create(profile.username, name, description, files);
+    navigate("/");
   };
 
   return (
