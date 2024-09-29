@@ -1,7 +1,7 @@
 from __future__ import annotations
 from pymongo import MongoClient
 
-DB_NAME = "voicemirror-web"
+DB_NAME = "voicemirror"
 USERS_COLLECTION = "users"
 
 # Users Columns
@@ -29,7 +29,7 @@ class User:
         self.username = username
         self.hashed_password = hashed_password
 
-    @classmethod
+    @staticmethod
     def from_dict(user_dict: dict[str, str]) -> User:
         return User(user_dict[COL_USERNAME], user_dict[COL_PASSWORD])
     
