@@ -16,6 +16,8 @@ from openai import OpenAI
 from langchain_openai import OpenAIEmbeddings
 from pymongo.operations import SearchIndexModel
 
+from chunker import process_document
+
 
 # Load environment variables & set constants
 load_dotenv()
@@ -187,8 +189,8 @@ def addData(persona, recipient, text_chunk):
     except Exception as e:
         return {"error": f"Failed to insert data into MongoDB: {str(e)}"} 
 
-def documentToChunks(document):
-    
+def editPersonaData(persona):
+
     pass
 
 class PersonaRequest(BaseModel):
@@ -210,11 +212,9 @@ def add_persona(persona_request: PersonaRequest):
     documents = persona_request.documents
 
     for document in documents:
-        chunks = documentToChunks(document)
+        chunks = process_document(document)
         for chunk in chunks:
             addData(persona, "none", chunk)
-        
-
     pass
     
 @app.post("/edit_persona")
@@ -223,6 +223,18 @@ def edit_persona(persona_request: PersonaRequest):
     #     raise HTTPException(status_code=400, detail="Username doesn't exist")
     
     # db_client.edit_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
+
+    username = persona_request.username
+    persona = persona_request.persona
+    description = persona_request.description
+    documents = persona_request.documents
+
+    for document in documents:
+        chunks = process_document(document)
+        for chunk in chunks:
+            addData(persona, "none", chunk)
+    pass
+
 
 
 
