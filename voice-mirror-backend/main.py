@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from gemini_adapter import GeminiAdapter
 from mongo_adapter import MongoAdapter
-from passlib.context import CryptContext
+import bcrypt
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 import jwt
@@ -35,7 +35,6 @@ CONVERSATION_COLLECTION = "conversations"
 # Initialize clients & security
 llm_client = GeminiAdapter(GEMINI_API_KEY)
 db_client = MongoAdapter(MONGODB_URI)
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 embeddings_model = OpenAIEmbeddings(api_key=OPENAI_API_KEY)
 client = MongoClient(MONGODB_URI)
@@ -64,12 +63,11 @@ def ping_uri():
 ping_uri()
 
 def hash_password(password: str) -> str:
-    return password
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 def verify_password(password: str, hashed_password: str) -> bool:
-    return password == hashed_password
-    return pwd_context.verify(password, hashed_password)
+    return bcrypt.checkpw(password.encode("utf-8"), hashed_password.encode("utf-8"))
+
 
 def create_jwt_token(username: str) -> str:
     expire = datetime.utcnow() + timedelta(days=1)
