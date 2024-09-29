@@ -7,7 +7,7 @@ USERS_COLLECTION = "users"
 # Users Columns
 COL_USERNAME = "username"
 COL_PASSWORD = "password"
-COL_PERSONA = "persona"
+COL_PERSONA = "personas"
 COL_DESCRIPTION = "description"
 COL_DOCUMENTS = "documents"
 
