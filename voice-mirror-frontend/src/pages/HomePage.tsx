@@ -1,23 +1,22 @@
 import PersonaCard from "../components/PersonaCard";
 import AddPersonaCard from "../components/AddPersonaCard";
 import avatar from "../assets/avatar.png";
+import { useContext } from "react";
+import { ProfileContext } from "../contexts/ProfileContext";
+import { Navigate } from "react-router-dom";
 
 export default function HomePage() {
-  const personaList: any[] = [
-    {
-      id: 1,
-      image: avatar,
-      name: "Harish Kanthi",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, molestie ipsum et, eleifend nunc",
-    },
-  ];
+  const { profile, personas } = useContext(ProfileContext);
+
+  if (!profile) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <div className="flex flex-col justify-center items-center gap-5">
       <h1 className="text-5xl font-bold text-primaryText">Choose a persona.</h1>
       <div className="flex flex-col justify-center items-center gap-5">
-        {personaList.map((persona) => (
+        {personas.map((persona) => (
           <PersonaCard persona={persona} />
         ))}
         <AddPersonaCard />
