@@ -43,7 +43,41 @@ def process_document(conversation, speaker_a, speaker_b):
         
     return formatted_conv
     
+def process_logs(conversation):
+    conversation = conversation.replace('\n','')
+    conversation = conversation.replace('[', '\n[')
+    lines=conversation.split("\n")
+    formatted_conv = []
+
+    # sliding window
+    N = len(lines)
+    print(N)
+    start = 0
+    end = start + WINDOW_SIZE
+
+
+
+    while start < N:
+        print(start, end)
+        if end > N:
+            end = N - 1
         
+        if start == end:
+            break
+
+        conv = ""
+        for i in range(start,end):
+            conv += lines[i]
+        
+        formatted_conv.append(conv)
+        start += INCREMENT
+        end += INCREMENT
+
+
+        
+    return formatted_conv
+
+
 
 
 def parse_conv(file_path, speaker_a, speaker_b):
