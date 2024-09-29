@@ -87,9 +87,7 @@ def verify_jwt_token(token: str) -> str:
         raise HTTPException(status_code=401, detail="Invalid token")
     
 def authenticate_user(token: str = Depends(oauth2_scheme)) -> str:
-    print("token: ", token)
     username = verify_jwt_token(token)
-    print("username: ", username)
     return username
 
 # ref: https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/
@@ -160,9 +158,8 @@ class ChatRequest(BaseModel):
 
 @app.post("/chat/")
 def protected_route(chat_request: ChatRequest, username: str = Depends(authenticate_user)):
-    print("chat_request: ", chat_request)
     response = llm_client.chat(username, chat_request.message)
-    return {"response": response}
+    return {"reply": response}
 
 def addData(persona, recipient, text_chunk):
     

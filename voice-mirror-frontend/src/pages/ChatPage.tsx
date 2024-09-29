@@ -8,22 +8,19 @@ import { chat } from "../api/api";
 export default function ChatPage() {
   const { profile } = useContext(ProfileContext);
   const navigate = useNavigate();
-  const [messages, setMessages] = useState([
-    {
-      isUser: true,
-      text: "Hi Harish!",
-    },
-    {
-      isUser: false,
-      text: "Hey whats up",
-    },
-  ]);
+  interface Message {
+    isUser: boolean;
+    text: string;
+  }
+
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const handleInputChange = (value: string) => {
     setInputValue(value);
   };
   const [isWaiting, setIsWaiting] = useState(false);
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (e: any) => {
+    e.preventDefault();
     const newMessages = [
       ...messages,
       {
@@ -39,11 +36,13 @@ export default function ChatPage() {
     if (response.error) {
       alert(response.data);
     } else {
+      console.log(response);
       newMessages.push({
         isUser: false,
-        text: response.data,
+        text: response.data.reply,
       });
       setMessages(newMessages);
+      setIsWaiting(false);
     }
   };
 
@@ -96,7 +95,7 @@ export default function ChatPage() {
         ))}
       </div>
 
-      <div className="flex items-center p-4 border-t w-full bg-secondary">
+      <form className="flex items-center p-4 border-t w-full bg-secondary" onSubmit={handleSendMessage}>
         <input
           type="text"
           value={inputValue}
@@ -105,13 +104,13 @@ export default function ChatPage() {
           className="flex-1 p-2 rounded-lg border-none outline-none mr-3 text-md"
         />
         <button
-          onClick={handleSendMessage}
+          type="submit"
           className="text-white font-bold py-2 px-4 rounded bg-primaryButton hover:bg-primary-dark focus:outline-none focus:shadow-outline"
           disabled={isWaiting}
         >
           Send
         </button>
-      </div>
+      </form>
     </div>
   );
 }
