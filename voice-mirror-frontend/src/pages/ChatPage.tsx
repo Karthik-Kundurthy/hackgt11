@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { ProfileContext } from "../contexts/ProfileContext";
 import { Navigate } from "react-router-dom";
+import { chat } from "../api/api";
 
 export default function ChatPage() {
   const { profile } = useContext(ProfileContext);
@@ -22,7 +23,7 @@ export default function ChatPage() {
     setInputValue(value);
   };
   const [isWaiting, setIsWaiting] = useState(false);
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     const newMessages = [
       ...messages,
       {
@@ -31,17 +32,19 @@ export default function ChatPage() {
       },
     ];
     setInputValue("");
-
     setMessages(newMessages);
     setIsWaiting(true);
-    setTimeout(() => {
+
+    const response = await chat(inputValue);
+    if (response.error) {
+      alert(response.data);
+    } else {
       newMessages.push({
         isUser: false,
-        text: "I am good, how are you?",
+        text: response.data,
       });
       setMessages(newMessages);
-      setIsWaiting(false);
-    }, 1000);
+    }
   };
 
   if (!profile) {

@@ -3,10 +3,11 @@ import { Profile } from "../models/Profile";
 import { Persona } from "../models/Persona";
 import { useState } from "react";
 import avatar from "../assets/avatar.png";
+import { login } from "../api/api";
 
 export default function ProfileProvider({ children }: any) {
   const [profile, setProfile] = useState<Profile | undefined>(undefined);
-  const [personas, setPersonas] = useState<Persona[]>([
+  const [personas, setPersonas] = useState<Persona[]>([ 
     {
       id: "1",
       image: avatar,
@@ -16,10 +17,14 @@ export default function ProfileProvider({ children }: any) {
     },
   ]);
 
-  const fetchProfile = async (name: string, password: string) => {
-    setProfile({
-      name: name,
-    });
+  const handleLogin = async (username: string, password: string) => {
+    const response = await login(username, password);
+    if (response.error) {
+      alert(response.data);
+    } else {
+      localStorage.setItem("token", response.data.access_token);
+      setProfile({ username: username });
+    }
   };
 
   return (
@@ -27,7 +32,7 @@ export default function ProfileProvider({ children }: any) {
       value={{
         profile: profile,
         personas: personas,
-        handleLogin: fetchProfile,
+        handleLogin: handleLogin,
       }}
     >
       {children}

@@ -1,17 +1,31 @@
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useState, useContext } from "react";
 import { ProfileContext } from "../contexts/ProfileContext";
 
 export default function LoginPage() {
-  const navigate = useNavigate();
   const [error, setError] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { handleLogin } = useContext(ProfileContext);
+  const { profile, handleLogin } = useContext(ProfileContext);
+
+  const onSubmit = async (e: any) => {
+      e.preventDefault();
+      if (password === "") {
+        setError(true);
+      } else {
+        await handleLogin(username, password);
+      }
+  };
+    
+  if (profile) {
+    return <Navigate to="/" />;
+  }
+
+
   return (
     <div className="w-full h-full flex items-center justify-center">
       <div className="w-full max-w-xs">
-        <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={onSubmit}>
           <div className="mb-4">
             <label
               className="block text-formLabelText text-sm font-bold mb-2"
@@ -52,15 +66,7 @@ export default function LoginPage() {
           <div className="flex items-center justify-between">
             <button
               className="bg-primaryButton hover:bg-primaryButtonHover text-primaryButtonText font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              type="button"
-              onClick={async () => {
-                if (password === "") {
-                  setError(true);
-                  return;
-                }
-                await handleLogin(username, password);
-                navigate("/");
-              }}
+              type="submit"
             >
               Sign In
             </button>

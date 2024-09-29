@@ -4,11 +4,11 @@ import { Persona } from "../models/Persona";
 
 interface ProfileContextInformation {
   profile: Profile | undefined;
-  handleLogin: (name: string, password: string) => Promise<void>;
+  handleLogin: (username: string, password: string) => Promise<void>;
   personas: Persona[];
 }
 export const ProfileContext = createContext<ProfileContextInformation>({
   profile: undefined,
-  handleLogin: async (name: string, password: string) => {},
+  handleLogin: async (username: string, password: string) => {},
   personas: [],
 });
