@@ -1,18 +1,13 @@
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ProfileContext } from "../contexts/ProfileContext";
 import { Navigate } from "react-router-dom";
 
 export default function ChatPage() {
   const { profile } = useContext(ProfileContext);
   const navigate = useNavigate();
-
-  if (!profile) {
-    return <Navigate to="/login" />;
-  }
-
-  const messages: any = [
+  const [messages, setMessages] = useState([
     {
       isUser: true,
       text: "Hi Harish!",
@@ -21,10 +16,37 @@ export default function ChatPage() {
       isUser: false,
       text: "Hey whats up",
     },
-  ];
-  const inputValue = "";
-  const handleInputChange = () => {};
-  const handleSendMessage = () => {};
+  ]);
+  const [inputValue, setInputValue] = useState("");
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+  };
+  const [isWaiting, setIsWaiting] = useState(false);
+  const handleSendMessage = () => {
+    const newMessages = [
+      ...messages,
+      {
+        isUser: true,
+        text: inputValue,
+      },
+    ];
+    setInputValue("");
+
+    setMessages(newMessages);
+    setIsWaiting(true);
+    setTimeout(() => {
+      newMessages.push({
+        isUser: false,
+        text: "I am good, how are you?",
+      });
+      setMessages(newMessages);
+      setIsWaiting(false);
+    }, 1000);
+  };
+
+  if (!profile) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <div className="flex flex-1 flex-col bg-secondary w-full mx-auto rounded-lg overflow-hidden">
@@ -75,13 +97,14 @@ export default function ChatPage() {
         <input
           type="text"
           value={inputValue}
-          onChange={handleInputChange}
+          onChange={(e) => handleInputChange(e.target.value)}
           placeholder="Type your message..."
           className="flex-1 p-2 rounded-lg border-none outline-none mr-3 text-md"
         />
         <button
           onClick={handleSendMessage}
-          className="text-white font-bold py-2 px-4 rounded bg-pir hover:bg-primary-dark focus:outline-none focus:shadow-outline"
+          className="text-white font-bold py-2 px-4 rounded bg-primaryButton hover:bg-primary-dark focus:outline-none focus:shadow-outline"
+          disabled={isWaiting}
         >
           Send
         </button>
