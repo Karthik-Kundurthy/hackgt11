@@ -216,18 +216,8 @@ def edit_persona(persona_request: ModifyPersonaRequest):
         persona_request.description
     )
 
-<<<<<<< HEAD
     for document in persona_request.documents:
-        chunks = process_document(document)
-=======
-    username = persona_request.username
-    persona = persona_request.persona
-    description = persona_request.description
-    documents = persona_request.documents
-
-    for document in documents:
         chunks = process_logs(document)
->>>>>>> c308ad019e026fa04b70e7be85693f44a7ff1250
         for chunk in chunks:
             addData(persona_request.username, persona_request.persona, chunk)
 
