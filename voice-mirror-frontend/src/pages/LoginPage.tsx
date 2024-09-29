@@ -1,11 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { ProfileContext } from "../contexts/ProfileContext";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [error, setError] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { handleLogin } = useContext(ProfileContext);
   return (
     <div className="w-full h-full flex items-center justify-center">
       <div className="w-full max-w-xs">
@@ -51,11 +53,12 @@ export default function LoginPage() {
             <button
               className="bg-primaryButton hover:bg-primaryButtonHover text-primaryButtonText font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               type="button"
-              onClick={() => {
+              onClick={async () => {
                 if (password === "") {
                   setError(true);
                   return;
                 }
+                await handleLogin(username, password);
                 navigate("/");
               }}
             >

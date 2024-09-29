@@ -1,8 +1,9 @@
 import { MdEdit } from "react-icons/md";
 import { MdChat } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { Persona } from "../models/Persona";
 
-export default function PersonaCard({ persona }: any) {
+export default function PersonaCard({ persona }: { persona: Persona }) {
   // typical card layout with image, title, and description and edit button
   const navigate = useNavigate();
   return (

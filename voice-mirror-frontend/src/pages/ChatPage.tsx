@@ -1,7 +1,17 @@
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { ProfileContext } from "../contexts/ProfileContext";
+import { Navigate } from "react-router-dom";
 
 export default function ChatPage() {
+  const { profile } = useContext(ProfileContext);
+  const navigate = useNavigate();
+
+  if (!profile) {
+    return <Navigate to="/login" />;
+  }
+
   const messages: any = [
     {
       isUser: true,
@@ -15,7 +25,6 @@ export default function ChatPage() {
   const inputValue = "";
   const handleInputChange = () => {};
   const handleSendMessage = () => {};
-  const navigate = useNavigate();
 
   return (
     <div className="flex flex-1 flex-col bg-secondary w-full mx-auto rounded-lg overflow-hidden">
@@ -72,7 +81,7 @@ export default function ChatPage() {
         />
         <button
           onClick={handleSendMessage}
-          className="text-white font-bold py-2 px-4 rounded bg-primaryButton hover:bg-primary-dark focus:outline-none focus:shadow-outline"
+          className="text-white font-bold py-2 px-4 rounded bg-pir hover:bg-primary-dark focus:outline-none focus:shadow-outline"
         >
           Send
         </button>
