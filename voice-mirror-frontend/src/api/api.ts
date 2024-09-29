@@ -1,11 +1,7 @@
-// create a full file for this to make api calls to my backend using fetch:
-
-import { createLessThan } from "typescript";
-
 const BASE_URL = "http://localhost:8080";
 
 export const fetchApi = async (endpoint: string, method: string, body: any) => {
-  const response = await fetch(`${BASE_URL}/${endpoint}/`, {
+  const response = await fetch(`${BASE_URL}/${endpoint}`, {
     method: method,
     headers: {
       "Content-Type": "application/json",

@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from gemini_adapter import GeminiAdapter
-from mongo_adapter import MongoAdapter, User
+from mongo_adapter import MongoAdapter
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from pydantic import BaseModel
@@ -135,7 +135,7 @@ class SignupRequest(BaseModel):
     username: str
     password: str
 
-@app.post("/signup/")
+@app.post("/signup")
 def signup_user(signup_request: SignupRequest):
     if db_client.get_user(signup_request.username):
         raise HTTPException(status_code=400, detail="Username already taken")
@@ -146,7 +146,7 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
-@app.post("/login/")
+@app.post("/login")
 def login_user(login_request: LoginRequest):
     user = db_client.get_user(login_request.username)
     if not user or not verify_password(login_request.password, user.hashed_password):
@@ -157,7 +157,7 @@ def login_user(login_request: LoginRequest):
 class ChatRequest(BaseModel):
     message: str
 
-@app.post("/chat/")
+@app.post("/chat")
 def protected_route(chat_request: ChatRequest, username: str = Depends(authenticate_user)):
     response = llm_client.chat(username, chat_request.message)
     return {"reply": response}
@@ -191,64 +191,58 @@ def documentToChunks(document):
     
     pass
 
-class PersonaRequest(BaseModel):
+class ModifyPersonaRequest(BaseModel):
     username: str
     persona: str
     description: str
     documents: list
 
 @app.post("/add_persona")
-def add_persona(persona_request: PersonaRequest):
-<<<<<<< HEAD
-    # if not db_client.get_user(persona_request.username):
-    #     raise HTTPException(status_code=400, detail="Username doesn't exist")
+def add_persona(persona_request: ModifyPersonaRequest):
+    print(persona_request)
+    if not db_client.get_user(persona_request.username):
+        raise HTTPException(status_code=400, detail="Username doesn't exist")
     
-    # db_client.add_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
+    db_client.add_persona(
+        persona_request.username, 
+        persona_request.persona, 
+        persona_request.description, 
+    )
 
     username = persona_request.username
     persona = persona_request.persona
     description = persona_request.description
     documents = persona_request.documents
 
+    return
+
     for document in documents:
         chunks = documentToChunks(document)
         for chunk in chunks:
             addData(persona, "none", chunk)
-        
-
-    pass
-    
-@app.post("/edit_persona")
-def edit_persona(persona_request: PersonaRequest):
-    # if not db_client.get_user(persona_request.username):
-    #     raise HTTPException(status_code=400, detail="Username doesn't exist")
-    
-    # db_client.edit_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
-=======
-    if not db_client.get_user(persona_request.username):
-        raise HTTPException(status_code=400, detail="Username doesn't exist")
-
-    db_client.add_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
 
 @app.post("/edit_persona")
-def edit_persona(persona_request: PersonaRequest):
-    if not db_client.get_user(persona_request.username):
+def edit_persona(persona_request: ModifyPersonaRequest):
+    user = db_client.get_user(persona_request.username)
+    if not user or not any(persona.name == persona_request.persona for persona in user.personas):
         raise HTTPException(status_code=400, detail="Username doesn't exist")
+    
+    db_client.edit_persona(
+        persona_request.username, 
+        persona_request.persona, 
+        persona_request.description, 
+    )
 
-    db_client.edit_persona(persona_request.username, persona_request.persona, persona_request.description, persona_request.documents)
->>>>>>> 3bf7eb5 (bunch of stuff)
-
-class PersonaGetRequest(BaseModel):
+class PersonaRequest(BaseModel):
     username: str
 
 @app.post("/get_personas")
-def get_personas(persona_request: PersonaGetRequest):
+def get_personas(persona_request: PersonaRequest):
     user = db_client.get_user(persona_request.username)
     if not user:
         raise HTTPException(status_code=400, detail="Username doesn't exist")
 
     return {"personas": user.personas}
-
 
 
 @app.post("/add_data")
