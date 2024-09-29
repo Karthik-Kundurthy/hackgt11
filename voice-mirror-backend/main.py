@@ -226,7 +226,7 @@ def edit_persona(persona_request: ModifyPersonaRequest):
     documents = persona_request.documents
 
     for document in documents:
-        chunks = process_document(document)
+        chunks = process_logs(document)
         for chunk in chunks:
             addData(persona, "none", chunk)
 

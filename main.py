@@ -142,8 +142,8 @@ def sample_conversation_search():
 
 # Prefilling database
 if __name__ == "__main__":
-
-    sample_conversation_search()
+    client[DB_NAME].conversations.deleteMany({})
+    # sample_conversation_search()
 
 
 
