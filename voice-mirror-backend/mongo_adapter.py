@@ -4,6 +4,7 @@ from typing import Any, Optional
 
 DB_NAME = "voicemirror"
 USERS_COLLECTION = "users"
+CONVERSATION_COLLECTION = "conversations"
 
 # Users Columns
 COL_USERNAME = "username"
@@ -17,6 +18,8 @@ class MongoAdapter:
         self.client = MongoClient(uri)
         self.db = self.client[DB_NAME]
         self.users = self.db[USERS_COLLECTION]
+        self.conversations = self.db[CONVERSATION_COLLECTION]
+        
 
     def insert_user(self, username: str, hashed_password: str) -> None:
         self.users.insert_one({COL_USERNAME: username, COL_PASSWORD: hashed_password})

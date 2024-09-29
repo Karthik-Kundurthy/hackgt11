@@ -16,7 +16,7 @@ from openai import OpenAI
 from langchain_openai import OpenAIEmbeddings
 from pymongo.operations import SearchIndexModel
 
-# from chunker import process_document
+from chunker import process_document
 
 
 # Load environment variables & set constants
@@ -214,8 +214,6 @@ def add_persona(persona_request: ModifyPersonaRequest):
     description = persona_request.description
     documents = persona_request.documents
 
-    return
-
     for document in documents:
         chunks = process_document(document)
         for chunk in chunks:
@@ -223,15 +221,15 @@ def add_persona(persona_request: ModifyPersonaRequest):
 
 @app.post("/edit_persona")
 def edit_persona(persona_request: ModifyPersonaRequest):
-    user = db_client.get_user(persona_request.username)
-    if not user or not any(persona.name == persona_request.persona for persona in user.personas):
-        raise HTTPException(status_code=400, detail="Username doesn't exist")
-    
-    db_client.edit_persona(
-        persona_request.username, 
-        persona_request.persona, 
-        persona_request.description, 
-    )
+    username = persona_request.username
+    persona = persona_request.persona
+    description = persona_request.description
+    documents = persona_request.documents
+
+    for document in documents:
+        chunks = process_document(document)
+        for chunk in chunks:
+            addData(persona, "none", chunk)
 
 class PersonaRequest(BaseModel):
     username: str
