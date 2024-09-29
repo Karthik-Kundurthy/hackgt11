@@ -42,7 +42,7 @@ class GeminiAdapter:
     def _initialize_conversation(self, config: dict):
         self.app.invoke({"messages": [HumanMessage(SYSTEM_PROMPT)]}, config)
 
-    def chat(self, username: str, message: str, thread_id: str = "default_thread") -> BaseMessage:
+    def chat(self, username: str, message: str, thread_id: str) -> BaseMessage:
         config = config = {"configurable": {"thread_id": thread_id}}
 
         if thread_id not in self.existing_thread_ids:
@@ -53,5 +53,6 @@ class GeminiAdapter:
         output = self.app.invoke({"messages": input_messages}, config)
         ai_message: AIMessage = output["messages"][-1]
 
+        print("Thread ID:", thread_id)
         print(ai_message)
         return ai_message.content

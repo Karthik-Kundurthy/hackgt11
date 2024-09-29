@@ -68,7 +68,6 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(password.encode("utf-8"), hashed_password.encode("utf-8"))
 
-
 def create_jwt_token(username: str) -> str:
     expire = datetime.utcnow() + timedelta(days=1)
     to_encode = {"sub": username, "exp": expire}
@@ -156,10 +155,11 @@ def login_user(login_request: LoginRequest):
 
 class ChatRequest(BaseModel):
     message: str
+    threadId: str
 
 @app.post("/chat")
 def protected_route(chat_request: ChatRequest, username: str = Depends(authenticate_user)):
-    response = llm_client.chat(username, chat_request.message)
+    response = llm_client.chat(username, chat_request.message, chat_request.threadId)
     return {"reply": response}
 
 def addData(persona, recipient, text_chunk):
@@ -221,6 +221,16 @@ def add_persona(persona_request: ModifyPersonaRequest):
 
 @app.post("/edit_persona")
 def edit_persona(persona_request: ModifyPersonaRequest):
+    user = db_client.get_user(persona_request.username)
+    if not user or not any(persona.persona == persona_request.persona for persona in user.personas):
+        raise HTTPException(status_code=400, detail="Username doesn't exist")
+    
+    db_client.edit_persona(
+        persona_request.username,
+        persona_request.persona,
+        persona_request.description
+    )
+
     username = persona_request.username
     persona = persona_request.persona
     description = persona_request.description
@@ -241,18 +251,6 @@ def get_personas(persona_request: PersonaRequest):
         raise HTTPException(status_code=400, detail="Username doesn't exist")
 
     return {"personas": user.personas}
-
-    username = persona_request.username
-    persona = persona_request.persona
-    description = persona_request.description
-    documents = persona_request.documents
-
-    for document in documents:
-        chunks = process_document(document)
-        for chunk in chunks:
-            addData(persona, "none", chunk)
-    pass
-
 
 
 @app.post("/add_data")

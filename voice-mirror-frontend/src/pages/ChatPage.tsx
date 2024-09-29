@@ -5,6 +5,7 @@ import { ProfileContext } from "../contexts/ProfileContext";
 import { Navigate } from "react-router-dom";
 import { chat } from "../api/api";
 import { useParams } from "react-router-dom";
+import { useMemo } from "react";
 
 export default function ChatPage() {
   const { name } = useParams();
@@ -15,6 +16,7 @@ export default function ChatPage() {
     text: string;
   }
 
+  const threadId = useMemo(() => name + Math.random().toString(36).substring(7), [name]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const handleInputChange = (value: string) => {
@@ -34,7 +36,7 @@ export default function ChatPage() {
     setMessages(newMessages);
     setIsWaiting(true);
 
-    const response = await chat(inputValue);
+    const response = await chat(inputValue, threadId);
     if (response.error) {
       alert(response.data);
     } else {
