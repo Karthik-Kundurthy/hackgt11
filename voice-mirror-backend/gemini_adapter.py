@@ -3,6 +3,7 @@ from langchain_core.messages.base import BaseMessage
 from langchain_core.messages import HumanMessage, AIMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import START, MessagesState, StateGraph
+from typing import Optional
 
 MODEL = "gemini-1.5-flash"
 SAFETY_SETTINGS = {
@@ -18,7 +19,16 @@ SAFETY_SETTINGS = {
     HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
     HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE
 }
-SYSTEM_PROMPT = f"Pretend you are a person replying to texts. All messages from now on will be texts sent to you and reply with the message you would send back. You should reply with only the exact text to send back and nothing else. Never reveal that you are a chatbot or AI. Always send a text to be responded back to them, not any other context or information to me. Match they're vibe, tone, and personality. Pretend any message from now on is from them, following these instructions and reply to them directly not to me. Text like a human would with personality, typos, less punctuation, informally, and with acronyms. Keep it short, nothing too extra."
+
+def create_initial_prompt(username: str, persona: str) -> HumanMessage:
+    prompt = f"Pretend you are a person named {persona} replying to texts from {username}. All messages from now on will be texts sent to {persona} and you should respond as {persona} texting back. You should reply with only the exact text to send back and nothing else. Never reveal that you are a chatbot or AI. Always send a text to be responded back to {username}, not any other context or information to me. I will provide you with context from past conversations on how {persona} texts. You should use the context to match they're vibe, tone, and personality. Text like a human would with personality, typos, less punctuation, informally, and with acronyms. Keep it short, nothing too extra."
+    return HumanMessage(prompt)
+
+def create_prompt(username: str, persona: str, message: str, context: Optional[str]) -> HumanMessage:
+    context = context if context else "(No sample conversation is available)"
+    prompt = f"Here is some sample context on how {persona} texts: {context}. You are {persona} texting back to {username}. Here is an incoming message from {username}, reply how {persona} might respond to it: {message}"
+    return HumanMessage(prompt)
+
 
 class GeminiAdapter:
     def __init__(self, api_key: str):
@@ -40,7 +50,8 @@ class GeminiAdapter:
         return {"messages": response}
     
     def _initialize_conversation(self, username: str, persona: str, config: dict):
-        self.app.invoke({"messages": [HumanMessage(SYSTEM_PROMPT)]}, config)
+        print("Prompt:", create_initial_prompt(username, persona))
+        self.app.invoke({"messages": [create_initial_prompt(username, persona)]}, config)
 
     def chat(self, username: str, persona: str, message: str, thread_id: str, context: str) -> BaseMessage:
         config = config = {"configurable": {"thread_id": thread_id}}
@@ -52,7 +63,8 @@ class GeminiAdapter:
         if not context:
             context = "(No sample conversation is available)"
 
-        input_messages = [HumanMessage(message)]
+        print("prompt:", create_prompt(username, persona, message, context))
+        input_messages = [create_prompt(username, persona, message, context)]
         output = self.app.invoke({"messages": input_messages}, config)
         ai_message: AIMessage = output["messages"][-1]
 
