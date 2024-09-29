@@ -1,4 +1,5 @@
 import PersonaForm from "../components/PersonaForm";
+import Title from "../components/Title";
 import { useContext } from "react";
 import { ProfileContext } from "../contexts/ProfileContext";
 import { Navigate } from "react-router-dom";
@@ -37,9 +38,12 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center gap-5">
-      <h1 className="text-5xl font-bold text-primaryText">Create a persona.</h1>
-      <PersonaForm personaFormHandler={createPersona} />
+    <div>
+      <Title />
+      <div className="flex flex-col justify-center items-center gap-5">
+        <h1 className="text-3xl font-bold text-primaryText">Create a persona</h1>
+        <PersonaForm personaFormHandler={createPersona} />
+      </div>
     </div>
   );
 }

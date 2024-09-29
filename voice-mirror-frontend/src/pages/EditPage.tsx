@@ -1,4 +1,5 @@
 import PersonaForm from "../components/PersonaForm";
+import Title from "../components/Title";
 import { useParams } from "react-router-dom";
 import { useContext } from "react";
 import { ProfileContext } from "../contexts/ProfileContext";
@@ -43,14 +44,17 @@ export default function EditPage() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center gap-5">
-      <h1 className="text-5xl font-bold text-primaryText">Edit a persona.</h1>
-      <PersonaForm
-        personaFormHandler={editPersona}
-        name={persona.name}
-        description={persona.description}
-        isEdit={true}
-      />
+    <div>
+      <Title />
+      <div className="flex flex-col justify-center items-center gap-5">
+        <h1 className="text-3xl font-bold text-primaryText">Edit a persona</h1>
+        <PersonaForm
+          personaFormHandler={editPersona}
+          name={persona.name}
+          description={persona.description}
+          isEdit={true}
+        />
+      </div>
     </div>
   );
 }

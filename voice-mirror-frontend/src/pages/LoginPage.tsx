@@ -1,3 +1,4 @@
+import Title from "../components/Title";
 import { Navigate } from "react-router-dom";
 import { useState, useContext } from "react";
 import { ProfileContext } from "../contexts/ProfileContext";
@@ -24,7 +25,8 @@ export default function LoginPage() {
 
   return (
     <div className="w-full h-full flex items-center justify-center">
-      <div className="w-full max-w-xs">
+      <div className="w-full max-w-sm">
+        <Title />
         <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={onSubmit}>
           <div className="mb-4">
             <label
@@ -65,7 +67,7 @@ export default function LoginPage() {
           </div>
           <div className="flex items-center justify-between">
             <button
-              className="bg-primaryButton hover:bg-primaryButtonHover text-primaryButtonText font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-primaryButton hover:bg-primaryButtonHover text-primaryButtonText font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
               type="submit"
             >
               Sign In

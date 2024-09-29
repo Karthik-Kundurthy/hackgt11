@@ -4,8 +4,10 @@ import { useContext, useState } from "react";
 import { ProfileContext } from "../contexts/ProfileContext";
 import { Navigate } from "react-router-dom";
 import { chat } from "../api/api";
+import { useParams } from "react-router-dom";
 
 export default function ChatPage() {
+  const { name } = useParams();
   const { profile } = useContext(ProfileContext);
   const navigate = useNavigate();
   interface Message {
@@ -62,7 +64,7 @@ export default function ChatPage() {
           </button>
         </div>
         <div className="flex-1 p-4 bg-secondary text-center font-bold text-lg">
-          Harish
+          {name}
         </div>
         <span className="flex-1"></span>
       </div>
