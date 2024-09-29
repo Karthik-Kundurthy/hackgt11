@@ -5,7 +5,7 @@ langchain-community
 langchain-google-genai
 langchain-openai
 pymongo
-passlib[bcrypt]
 pyjwt
 openai
 langgraph
+bcrypt
