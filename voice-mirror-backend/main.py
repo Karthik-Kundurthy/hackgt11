@@ -15,8 +15,7 @@ from langchain_community.llms import OpenAI
 from openai import OpenAI
 from langchain_openai import OpenAIEmbeddings
 from pymongo.operations import SearchIndexModel
-
-from chunker import process_document
+from chunker import process_document, process_logs
 
 
 # Load environment variables & set constants
@@ -162,7 +161,7 @@ def protected_route(chat_request: ChatRequest, username: str = Depends(authentic
     response = llm_client.chat(username, chat_request.message)
     return {"reply": response}
 
-def addData(persona, recipient, text_chunk):
+def addData(username, persona, text_chunk):
 
     # create text embedding
     try:
@@ -172,12 +171,12 @@ def addData(persona, recipient, text_chunk):
         return {"message": "could not embed"}
 
     # create document and insert
-    now = datetime.datetime.now()
+    now = datetime.now()
     document = {
-        "username": recipient,
+        "username": username,
         "persona": persona,
         "raw_text": text_chunk,
-        "conversation_id": f"{recipient}:{persona}:{now}",
+        "conversation_id": f"{username}:{persona}:{now}",
         "text_embedding": embedding_vector  # Adding generated embedding vector
     }
 
@@ -215,9 +214,9 @@ def add_persona(persona_request: ModifyPersonaRequest):
     documents = persona_request.documents
 
     for document in documents:
-        chunks = process_document(document)
+        chunks = process_logs(document)
         for chunk in chunks:
-            addData(persona, "none", chunk)
+            addData(username, persona, chunk)
 
 @app.post("/edit_persona")
 def edit_persona(persona_request: ModifyPersonaRequest):
